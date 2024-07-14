@@ -22,7 +22,7 @@ export default function AppLayout({
       <body
         className={twMerge(
           inter.className,
-          "grid h-screen max-h-screen w-full place-items-center dark"
+          "grid h-[100dvh] max-h-[100dvh] w-full place-items-center dark"
         )}
       >
         <RootLayout>

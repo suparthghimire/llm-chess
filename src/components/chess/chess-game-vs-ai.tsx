@@ -49,8 +49,20 @@ export default function ChessGameVsAI() {
   }, [chess, playSound]);
 
   return (
-    <div className="w-full grid place-items-center gap-3">
-      <div className="flex w-full items-center gap-5">
+    <div className="w-full grid place-items-center gap-10">
+      <ChessBoard
+        makeAIMove={(pgn: string) => mutate(pgn)}
+        lightPlayer={{
+          name: "You",
+          avatar: "/assets/chess/human/default.png",
+        }}
+        darkPlayer={{
+          thinking: mutation.isPending,
+          name: "Google Gemini",
+          avatar: "/assets/chess/ai/gemini.png",
+        }}
+      />
+      <div className="flex pb-3 max-w-screen overflow-auto w-full items-center gap-5 px-3">
         <Button
           type="button"
           variant="outline"
@@ -76,18 +88,6 @@ export default function ChessGameVsAI() {
           Reset Game
         </Button>
       </div>
-      <ChessBoard
-        makeAIMove={(pgn: string) => mutate(pgn)}
-        lightPlayer={{
-          name: "You",
-          avatar: "/assets/chess/human/default.png",
-        }}
-        darkPlayer={{
-          thinking: mutation.isPending,
-          name: "Google Gemini",
-          avatar: "/assets/chess/ai/gemini.png",
-        }}
-      />
       <GameInfoSheet
         open={showGameInfo}
         onOpenChange={(open) => setShowGameInfo(open)}

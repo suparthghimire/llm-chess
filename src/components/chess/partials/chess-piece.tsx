@@ -15,7 +15,7 @@ function ChessPiece({ piece, id }: { piece: Piece; id: string }) {
       {...listeners}
       src={`/assets/chess/pieces/${piece.color}${piece.type}.png`}
       alt={`${piece.color}${piece.type}`}
-      className="w-full cursor-grab active:cursor-grabbing h-full object-contain"
+      className="w-full cursor-grab active:cursor-grabbing h-full object-contain touch-none"
     />
   );
 }
