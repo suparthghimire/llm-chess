@@ -90,9 +90,7 @@ function GameProvider({
   }
 
   function playRandomMove() {
-    const moves = chess.moves();
-    const move = moves[Math.floor(Math.random() * moves.length)];
-    chess.move(move);
+    chess.move(ChessUtils.getRandomMove(chess));
     const moveType = ChessUtils.getMoveType(chess);
     playSound(moveType);
     setRerenderBoard((pv) => !pv);
