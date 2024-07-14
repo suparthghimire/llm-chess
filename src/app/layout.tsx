@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { twMerge } from "tailwind-merge";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -16,7 +17,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body
+        className={twMerge(
+          inter.className,
+          "grid min-h-screen w-full place-items-center dark"
+        )}
+      >
+        <main className="w-full md:max-w-[770px] p-3 lg:p-0">{children}</main>
+      </body>
     </html>
   );
 }
