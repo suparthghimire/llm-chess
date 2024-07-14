@@ -23,6 +23,7 @@ function ChessBoard({
   lightPlayer: Player;
   darkPlayer: Player;
   makeAIMove?: (pgn: string) => void;
+  aiThinking?: boolean;
 }) {
   const {
     chess,

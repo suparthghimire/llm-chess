@@ -4,6 +4,7 @@ import React from "react";
 export type Player = {
   name: string;
   avatar: string;
+  thinking?: boolean;
 };
 
 export type T_PlayerCardProps = {
@@ -21,7 +22,12 @@ function PlayerCard({ player }: T_PlayerCardProps) {
           className="rounded-full object-contain"
         />
       </div>
-      <h1 className="text-lg md:text-xl font-bold">{player.name}</h1>
+      <div className="flex items-center gap-3">
+        <h1 className="text-lg md:text-xl font-bold">{player.name}</h1>
+        {player.thinking && (
+          <div className="size-4 bg-green-500 animate-pulse rounded-full" />
+        )}
+      </div>
     </div>
   );
 }

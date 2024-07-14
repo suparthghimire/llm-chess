@@ -83,6 +83,7 @@ export default function ChessGameVsAI() {
           avatar: "/assets/chess/human/default.png",
         }}
         darkPlayer={{
+          thinking: mutation.isPending,
           name: "Google Gemini",
           avatar: "/assets/chess/ai/gemini.png",
         }}
