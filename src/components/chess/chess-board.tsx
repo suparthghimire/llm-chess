@@ -14,29 +14,30 @@ import { ChessUtils } from "@/lib/chess/chess.util";
 import ChessPiece from "./chess-piece";
 import type { T_GameState } from "@/lib/chess/chess.types";
 import GameOverDialog from "./game-over-dialog";
+import { useChessContext } from "@/lib/provider/game.provider";
 
 function ChessBoard({
-  chess,
   lightPlayer,
   darkPlayer,
-  handleFromToMove,
 }: {
-  chess: Chess;
   lightPlayer: Player;
   darkPlayer: Player;
-  handleFromToMove: (params: { from: Square; to: Square }) => void;
 }) {
+  const {
+    chess,
+    moveFromTo,
+    gameState,
+    setGameState,
+    handleGameOver,
+    rerenderBoard,
+  } = useChessContext();
+
   const board = chess.board();
-  const [rerenderBoard, setRerenderBoard] = useState(false);
 
   const [draggingPiece, setDraggingPiece] = useState<Piece | null>(null);
   const [validSquaresForPiece, setValidSquaresForPiece] = useState<Square[]>(
     []
   );
-
-  const [gameState, setGameState] = useState<T_GameState>({
-    status: "playing",
-  });
 
   const [checkSquare, setCheckSquare] = useState<Square | null>(null);
 
@@ -66,12 +67,10 @@ function ChessBoard({
 
     if (!fromSq || !toSq) return;
 
-    handleFromToMove({
+    moveFromTo({
       from: fromSq,
       to: toSq,
     });
-
-    setRerenderBoard((pv) => !pv);
 
     const gameOverStatus = ChessUtils.getGameOverStatus(chess);
 
@@ -102,13 +101,6 @@ function ChessBoard({
   const handleDragCancel = () => {
     setDraggingPiece(null);
     setValidSquaresForPiece([]);
-  };
-
-  const handleGameOver = () => {
-    chess.reset();
-    handleDragCancel();
-    setGameState({ status: "playing" });
-    setRerenderBoard((pv) => !pv);
   };
 
   return (

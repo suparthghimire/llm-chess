@@ -10,7 +10,7 @@ export const ChessUtils = {
       result.push(words.slice(i, i + 3).join(" "));
     }
 
-    return result;
+    return result.filter(Boolean);
   },
   getSquareName(rowIndex: number, colIndex: number): Square {
     const col = String.fromCharCode(97 + colIndex);
