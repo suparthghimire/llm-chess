@@ -21,3 +21,12 @@ type T_GameOverCheckmate = {
 };
 
 export type T_GameState = T_GameStatusNoWinner | T_GameOverCheckmate;
+
+export type T_MoveType =
+  | "CHECK"
+  | "WIN"
+  | "DRAW"
+  | "CAPTURE"
+  | "CASTLE"
+  | "MOVE"
+  | "LOOSE";

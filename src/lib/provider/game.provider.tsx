@@ -4,7 +4,8 @@ import React, {
   createContext,
   useContext,
 } from "react";
-import type { T_GameState } from "../chess/chess.types";
+import type { T_GameState, T_MoveType } from "../chess/chess.types";
+import { ChessUtils } from "../chess/chess.util";
 
 type T_GameContext = {
   chess: Chess;
@@ -15,11 +16,22 @@ type T_GameContext = {
   setRerenderBoard: (value: boolean) => void;
   moveFromTo: (args: { from: Square; to: Square }) => void;
   playRandomMove: () => void;
-
+  playSound: (type: T_MoveType) => void;
   handleGameOver: () => void;
+  handleForceDraw: () => void;
 };
 
 const GameContext = createContext<T_GameContext>({} as T_GameContext);
+
+const sounds = {
+  move: new Audio("/assets/chess/sounds/move.mp3"),
+  capture: new Audio("/assets/chess/sounds/capture.mp3"),
+  check: new Audio("/assets/chess/sounds/check.mp3"),
+  castle: new Audio("/assets/chess/sounds/castle.mp3"),
+  win: new Audio("/assets/chess/sounds/win.mp3"),
+  draw: new Audio("/assets/chess/sounds/draw.mp3"),
+  loose: new Audio("/assets/chess/sounds/loose.mp3"),
+};
 
 function GameProvider({
   chess,
@@ -28,7 +40,34 @@ function GameProvider({
   const [gameState, setGameState] = React.useState<T_GameState>({
     status: "playing",
   });
+
   const [rerenderBoard, setRerenderBoard] = React.useState<boolean>(false);
+
+  function playSound(type: T_MoveType) {
+    switch (type) {
+      case "WIN":
+        sounds.win.play();
+        break;
+      case "DRAW":
+        sounds.draw.play();
+        break;
+      case "CHECK":
+        sounds.check.play();
+        break;
+      case "CASTLE":
+        sounds.castle.play();
+        break;
+      case "CAPTURE":
+        sounds.capture.play();
+        break;
+      case "LOOSE":
+        sounds.loose.play();
+        break;
+      default:
+        sounds.move.play();
+        break;
+    }
+  }
 
   function moveFromTo({ from, to }: { from: Square; to: Square }) {
     try {
@@ -37,6 +76,8 @@ function GameProvider({
         to,
         promotion: "q",
       });
+      const moveType = ChessUtils.getMoveType(chess);
+      playSound(moveType);
       setRerenderBoard((pv) => !pv);
     } catch (error) {
       console.log("ERROR");
@@ -52,6 +93,8 @@ function GameProvider({
     const moves = chess.moves();
     const move = moves[Math.floor(Math.random() * moves.length)];
     chess.move(move);
+    const moveType = ChessUtils.getMoveType(chess);
+    playSound(moveType);
     setRerenderBoard((pv) => !pv);
   }
 
@@ -61,6 +104,12 @@ function GameProvider({
     setRerenderBoard((pv) => !pv);
   }
 
+  function handleForceDraw() {
+    chess.reset();
+    playSound("DRAW");
+    setGameState({ status: "draw" });
+    setRerenderBoard((pv) => !pv);
+  }
   return (
     <GameContext.Provider
       value={{
@@ -68,7 +117,9 @@ function GameProvider({
         chess,
         moveFromTo,
         playRandomMove,
+        handleForceDraw,
         rerenderBoard,
+        playSound,
         setRerenderBoard,
         resetGame,
         gameState,

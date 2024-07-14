@@ -22,7 +22,7 @@ function ChessSquare({
     <div
       ref={setNodeRef}
       className={twMerge(
-        "relative size-full aspect-square text-red-900 font-bold grid place-items-center",
+        "relative select-none size-full aspect-square text-red-900 font-bold grid place-items-center",
         type === "light" ? "bg-gray-300" : "bg-gray-600"
       )}
     >

@@ -39,7 +39,7 @@ export const ChessUtils = {
     }
     return null; // If piece is not found
   },
-  getGameOverStatus(chess: Chess): T_GameState {
+  getGameState(chess: Chess): T_GameState {
     const hasWhiteWon = chess.isCheckmate() && chess.turn() === "b";
     const hasBlackWon = chess.isCheckmate() && chess.turn() === "w";
 
@@ -118,5 +118,21 @@ export const ChessUtils = {
           description: "Game is still in progress!",
         };
     }
+  },
+  getMoveType(chess: Chess) {
+    const history = chess.history({ verbose: true });
+
+    const isCheck = chess.isCheck();
+    const isCheckmate = chess.isCheckmate();
+    const isDraw = chess.isDraw();
+
+    const lastMove = history.at(-1);
+
+    if (isCheck) return "CHECK";
+    if (isCheckmate) return "WIN";
+    if (isDraw) return "DRAW";
+    if (lastMove?.flags === "c" || lastMove?.flags === "e") return "CAPTURE";
+    if (lastMove?.flags === "k" || lastMove?.flags === "O") return "CASTLE";
+    return "MOVE";
   },
 };

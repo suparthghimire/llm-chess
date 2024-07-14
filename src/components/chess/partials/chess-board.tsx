@@ -1,5 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import type { Chess, Piece, Square } from "chess.js";
 import ChessSquare from "./chess-square";
 import type { Player } from "../../player/player-card";
@@ -72,7 +72,7 @@ function ChessBoard({
       to: toSq,
     });
 
-    const gameOverStatus = ChessUtils.getGameOverStatus(chess);
+    const gameOverStatus = ChessUtils.getGameState(chess);
 
     // if game over status is not playing, then set the game state and end the game
     if (gameOverStatus.status !== "playing") {
