@@ -50,8 +50,10 @@ function GameProvider({
   >([]);
   const [draggingPiece, setDraggingPiece] = React.useState<Piece | null>(null);
 
-  const sounds = useMemo(
-    () => ({
+  const sounds = useMemo(() => {
+    // if audio is not defined return
+    if (typeof Audio === "undefined") return;
+    return {
       move: new Audio("/assets/chess/sounds/move.mp3"),
       capture: new Audio("/assets/chess/sounds/capture.mp3"),
       check: new Audio("/assets/chess/sounds/check.mp3"),
@@ -59,13 +61,13 @@ function GameProvider({
       win: new Audio("/assets/chess/sounds/win.mp3"),
       draw: new Audio("/assets/chess/sounds/draw.mp3"),
       loose: new Audio("/assets/chess/sounds/loose.mp3"),
-    }),
-    []
-  );
+    };
+  }, []);
 
   const [rerenderBoard, setRerenderBoard] = React.useState<boolean>(false);
 
   function playSound(type: T_MoveType) {
+    if (!sounds) return;
     switch (type) {
       case "WIN":
         sounds.win.play();
