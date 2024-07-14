@@ -20,7 +20,7 @@ export default function RootLayout({
       <body
         className={twMerge(
           inter.className,
-          "grid min-h-screen w-full place-items-center dark"
+          "grid h-screen max-h-screen w-full place-items-center dark"
         )}
       >
         <main className="w-full md:max-w-[770px] p-3 lg:p-0">{children}</main>
