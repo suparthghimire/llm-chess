@@ -2,6 +2,16 @@ import type { Chess, Color, Piece, PieceSymbol, Square } from "chess.js";
 import type { T_Board, T_GameState } from "./chess.types";
 
 export const ChessUtils = {
+  splitPgn(pgn: string) {
+    const words = pgn.split(/\s+/); // Split by any whitespace
+    const result: string[] = [];
+
+    for (let i = 0; i < words.length; i += 3) {
+      result.push(words.slice(i, i + 3).join(" "));
+    }
+
+    return result;
+  },
   getSquareName(rowIndex: number, colIndex: number): Square {
     const col = String.fromCharCode(97 + colIndex);
     const row = 8 - rowIndex;

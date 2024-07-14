@@ -3,10 +3,11 @@ import ChessBoard from "@/components/chess/chess-board";
 import { Button } from "@/components/ui/button";
 import { Chess, type Square } from "chess.js";
 import { useMemo, useState } from "react";
-import { IconChess, IconInfoCircle, IconReload } from "@tabler/icons-react";
+import { IconInfoCircle } from "@tabler/icons-react";
+import GameInfoSheet from "@/components/chess/game-info-sheet";
 export default function Home() {
   const chess = useMemo(() => new Chess(), []);
-
+  const [showGameInfo, setShowGameInfo] = useState(false);
   const handleFromToMove = ({ from, to }: { from: Square; to: Square }) => {
     try {
       chess.move({
@@ -21,19 +22,14 @@ export default function Home() {
 
   return (
     <div className="w-full grid place-items-center gap-3">
-      <div>{chess.fen()}</div>
       <div className="flex w-full items-center gap-5">
-        <Button type="button" variant="default">
-          <IconChess />
-          Play Random Move
-        </Button>
-        <Button type="button" variant="outline">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => setShowGameInfo((pv) => !pv)}
+        >
           <IconInfoCircle />
           Game Info
-        </Button>
-        <Button type="button" variant="destructive">
-          <IconReload />
-          Restart Game
         </Button>
       </div>
       <ChessBoard
@@ -47,6 +43,13 @@ export default function Home() {
           avatar: "/assets/chess/ai/gemini.png",
         }}
         chess={chess}
+      />
+      <GameInfoSheet
+        chess={chess}
+        sheetProps={{
+          open: showGameInfo,
+          onOpenChange: (open) => setShowGameInfo(open),
+        }}
       />
     </div>
   );

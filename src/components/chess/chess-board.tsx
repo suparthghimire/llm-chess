@@ -85,8 +85,11 @@ function ChessBoard({
     if (isCheck) {
       const currentTurn = chess.turn();
       // get position of king in check
-      const checkSq = ChessUtils.getSquareFromPiece("k", "b", chess.board());
-      console.log({ checkSq });
+      const checkSq = ChessUtils.getSquareFromPiece(
+        "k",
+        currentTurn,
+        chess.board()
+      );
       setCheckSquare(checkSq);
     } else {
       setCheckSquare(null);
