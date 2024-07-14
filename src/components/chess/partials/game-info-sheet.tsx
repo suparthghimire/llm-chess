@@ -10,10 +10,10 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import type { DialogProps } from "@radix-ui/react-dialog";
-import { Separator } from "../ui/separator";
+import { Separator } from "../../ui/separator";
 import { twMerge } from "tailwind-merge";
 import { useChessContext } from "@/lib/provider/game.provider";
-import { Button } from "../ui/button";
+import { Button } from "../../ui/button";
 import {
   IconAlertSquare,
   IconCheck,

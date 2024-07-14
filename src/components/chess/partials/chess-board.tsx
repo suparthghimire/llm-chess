@@ -2,8 +2,8 @@
 import React, { useState } from "react";
 import type { Chess, Piece, Square } from "chess.js";
 import ChessSquare from "./chess-square";
-import type { Player } from "../player/player-card";
-import PlayerCard from "../player/player-card";
+import type { Player } from "../../player/player-card";
+import PlayerCard from "../../player/player-card";
 import {
   DndContext,
   DragOverlay,

@@ -1,12 +1,14 @@
 "use client";
-import ChessBoard from "@/components/chess/chess-board";
+import ChessBoard from "@/components/chess/partials/chess-board";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { IconInfoCircle } from "@tabler/icons-react";
-import GameInfoSheet from "@/components/chess/game-info-sheet";
+import { IconInfoCircle, IconReload } from "@tabler/icons-react";
+import GameInfoSheet from "@/components/chess/partials/game-info-sheet";
+import { useChessContext } from "@/lib/provider/game.provider";
 
-export default function ChessGame() {
+export default function ChessGameVsAI() {
   const [showGameInfo, setShowGameInfo] = useState(false);
+  const { resetGame } = useChessContext();
   return (
     <div className="w-full grid place-items-center gap-3">
       <div className="flex w-full items-center gap-5">
@@ -17,6 +19,10 @@ export default function ChessGame() {
         >
           <IconInfoCircle />
           Game Info
+        </Button>
+        <Button type="button" variant="destructive" onClick={resetGame}>
+          <IconReload />
+          Reset Game
         </Button>
       </div>
       <ChessBoard
