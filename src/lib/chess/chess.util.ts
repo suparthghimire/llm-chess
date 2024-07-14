@@ -138,7 +138,7 @@ export const ChessUtils = {
     if (isCheckmate) return "WIN";
     if (isDraw) return "DRAW";
     if (lastMove?.flags === "c" || lastMove?.flags === "e") return "CAPTURE";
-    if (lastMove?.flags === "k" || lastMove?.flags === "O") return "CASTLE";
+    if (lastMove?.flags === "k" || lastMove?.flags === "q") return "CASTLE";
     return "MOVE";
   },
   getRandomMove(chess: Chess) {

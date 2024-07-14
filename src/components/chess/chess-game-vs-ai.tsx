@@ -1,14 +1,39 @@
 "use client";
 import ChessBoard from "@/components/chess/partials/chess-board";
 import { Button } from "@/components/ui/button";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { IconEqual, IconInfoCircle, IconReload } from "@tabler/icons-react";
 import GameInfoSheet from "@/components/chess/partials/game-info-sheet";
 import { useChessContext } from "@/lib/provider/game.provider";
+import { useMutation } from "@tanstack/react-query";
+import { mutationKeys } from "@/lib/react-query/query-mutation-keys";
+import { geminiMove } from "@/lib/api/endpoints";
 
 export default function ChessGameVsAI() {
   const [showGameInfo, setShowGameInfo] = useState(false);
-  const { chess, resetGame, playSound, handleForceDraw } = useChessContext();
+
+  const [hasBeenReset, setHasBeenReset] = useState(false);
+
+  const { chess, setNewPgn, resetGame, playSound, handleForceDraw } =
+    useChessContext();
+
+  const mutation = useMutation({
+    mutationKey: [mutationKeys.geminiMove],
+    mutationFn: (pgn: string) => geminiMove(pgn),
+    onSuccess: (data) => {
+      console.log(data.data.pgn);
+      if (hasBeenReset) {
+        setHasBeenReset(false);
+        return;
+      }
+      setNewPgn(data.data.pgn);
+    },
+    onError: (error) => {
+      console.error(error);
+    },
+  });
+
+  const { mutate } = mutation;
 
   useEffect(() => {
     const isCheckmate = chess.isCheckmate();
@@ -39,12 +64,20 @@ export default function ChessGameVsAI() {
           <IconEqual />
           Draw Game
         </Button>
-        <Button type="button" variant="destructive" onClick={resetGame}>
+        <Button
+          type="button"
+          variant="destructive"
+          onClick={() => {
+            setHasBeenReset(true);
+            resetGame();
+          }}
+        >
           <IconReload />
           Reset Game
         </Button>
       </div>
       <ChessBoard
+        makeAIMove={(pgn: string) => mutate(pgn)}
         lightPlayer={{
           name: "You",
           avatar: "/assets/chess/human/default.png",

@@ -18,10 +18,11 @@ export async function POST(request: Request) {
     chess.loadPgn(pgn);
 
     // Get the next move from the AI
-    const newPgn = await GetGeminiResponse(pgn);
+    const response = await GetGeminiResponse(pgn);
 
     return NextResponse.json({
-      pgn: newPgn,
+      status: 200,
+      data: response,
     });
   } catch (error) {
     if (error instanceof Error)

@@ -12,40 +12,41 @@ import {
 } from "@dnd-kit/core";
 import { ChessUtils } from "@/lib/chess/chess.util";
 import ChessPiece from "./chess-piece";
-import type { T_GameState } from "@/lib/chess/chess.types";
 import GameOverDialog from "./game-over-dialog";
 import { useChessContext } from "@/lib/provider/game.provider";
 
 function ChessBoard({
   lightPlayer,
   darkPlayer,
+  makeAIMove,
 }: {
   lightPlayer: Player;
   darkPlayer: Player;
+  makeAIMove?: (pgn: string) => void;
 }) {
   const {
     chess,
     moveFromTo,
     gameState,
-    setGameState,
     handleGameOver,
     rerenderBoard,
+    checkSquare,
+    validSquaresForPiece,
+    draggingPiece,
+    setDraggingPiece,
+    setValidSquaresForPiece,
   } = useChessContext();
 
   const board = chess.board();
 
-  const [draggingPiece, setDraggingPiece] = useState<Piece | null>(null);
-  const [validSquaresForPiece, setValidSquaresForPiece] = useState<Square[]>(
-    []
-  );
-
-  const [checkSquare, setCheckSquare] = useState<Square | null>(null);
-
   const handleDragStart = (event: DragStartEvent) => {
+    // if it is not whites turn, then return
+    if (chess.turn() !== "w") return;
+
     const activeSq = event.active.id as Square;
     const piece = chess.get(activeSq as Square);
 
-    if (!piece) return;
+    if (!piece || piece.color !== "w") return;
 
     setDraggingPiece(piece);
 
@@ -60,45 +61,34 @@ function ChessBoard({
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
+    if (chess.turn() !== "w") return;
+
     setValidSquaresForPiece([]);
 
     const fromSq = event.active.id as Square | undefined;
     const toSq = event.over?.id as Square | undefined;
 
     if (!fromSq || !toSq) return;
+    const fromPiece = chess.get(fromSq as Square);
+
+    if (!fromPiece || fromPiece.color !== "w") return;
+
+    if (fromSq === toSq) return;
 
     moveFromTo({
       from: fromSq,
       to: toSq,
     });
 
-    const gameOverStatus = ChessUtils.getGameState(chess);
-
-    // if game over status is not playing, then set the game state and end the game
-    if (gameOverStatus.status !== "playing") {
-      setGameState(gameOverStatus);
-      return;
+    if (makeAIMove) {
+      const pgn = chess.pgn();
+      makeAIMove(pgn);
     }
-
-    const isCheck = chess.isCheck();
-    if (isCheck) {
-      const currentTurn = chess.turn();
-      // get position of king in check
-      const checkSq = ChessUtils.getSquareFromPiece(
-        "k",
-        currentTurn,
-        chess.board()
-      );
-      setCheckSquare(checkSq);
-    } else {
-      setCheckSquare(null);
-    }
-
-    setDraggingPiece(null);
-    setValidSquaresForPiece([]);
   };
 
   const handleDragCancel = () => {
+    if (chess.turn() !== "w") return;
+
     setDraggingPiece(null);
     setValidSquaresForPiece([]);
   };

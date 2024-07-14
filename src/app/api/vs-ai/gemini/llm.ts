@@ -13,10 +13,6 @@ function getPrompt(pgn: string) {
   const basePrefix =
     "WHAT IS YOUR NEXT MOVE? ONLY MAKE ONE MOVE AND REPLY WITH FULL PGN HISTORY UPTO YOUR NEXT MOVE. DONT APPEND OR PREPEND ANY EXTRA TEXT TO PGN STRING";
 
-  // check if king is under check
-  if (chess.inCheck())
-    return `${basePrompt}. YOUR KING IS UNDER CHECK. YOUR MOVE MUST BE TO SAVE THE KING. ${basePrefix}`;
-
   // check if any piece is under attack
   // for each square on board check if any piece is under attack
   const piecesInDanger = ChessUtils.getAllPiecesInDanger(pgn, "w");
@@ -33,7 +29,15 @@ function getPrompt(pgn: string) {
     return str;
   };
 
-  // check by order: Q is most important, p is least important
+  // check by order: K is most important, p is least important
+
+  if (piecesInDanger.k.attackers.length > 0)
+    return `${basePrompt}. YOUR KING AT SQUARE '${
+      piecesInDanger.k.at
+    }' IS IN CHECK FROM FOLLOWING: '${constructAttackerSentence(
+      piecesInDanger.k.attackers
+    )}'. MAKE SURE THE KING IS PROTECTED BY OTHER PIECE. IF NOT, PROTECT THE KING BY ANOTHER PIECE SO THAT THE POINT WILL BE SAME AND YOU WILL NOT BE AT A DISADVANTAGE. ${basePrefix}`;
+
   if (piecesInDanger.q.attackers.length > 0)
     return `${basePrompt}. YOUR QUEEN AT SQUARE '${
       piecesInDanger.q.at
@@ -61,13 +65,6 @@ function getPrompt(pgn: string) {
     }' IS UNDER ATTACK FROM FOLLOWING: '${constructAttackerSentence(
       piecesInDanger.n.attackers
     )}'. MAKE SURE THE KNIGHT IS PROTECTED BY OTHER PIECE. IF NOT, PROTECT THE KNIGHT BY ANOTHER PIECE SO THAT THE POINT WILL BE SAME AND YOU WILL NOT BE AT A DISADVANTAGE. ${basePrefix}`;
-
-  if (piecesInDanger.k.attackers.length > 0)
-    return `${basePrompt}. YOUR KING AT SQUARE '${
-      piecesInDanger.k.at
-    }' IS UNDER ATTACK FROM FOLLOWING: '${constructAttackerSentence(
-      piecesInDanger.k.attackers
-    )}'. MAKE SURE THE KING IS PROTECTED BY OTHER PIECE. IF NOT, PROTECT THE KING BY ANOTHER PIECE SO THAT THE POINT WILL BE SAME AND YOU WILL NOT BE AT A DISADVANTAGE. ${basePrefix}`;
 
   if (piecesInDanger.p.attackers.length > 0)
     return `${basePrompt}. YOUR PAWN AT SQUARE '${
@@ -151,6 +148,10 @@ export async function GetGeminiResponse(originalPgn: string) {
     // Play a random move
     const chess = new Chess();
     chess.loadPgn(originalPgn);
-    return { prompt, pgn: ChessUtils.getRandomMove(chess), fromGemini: false };
+
+    const move = ChessUtils.getRandomMove(chess);
+    chess.move(move);
+    const pgn = chess.pgn();
+    return { prompt, pgn: pgn, fromGemini: false };
   }
 }
