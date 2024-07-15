@@ -48,21 +48,21 @@ pnpm run dev
 Here is a sequence describing how the app functions:
 
 **Note**
-Human player plays as White and AI (Google Gemini) plays as black. Currently there is no option to play as black as a human. There is no time limit on how long any player can take to play a move. 
 
-1. Human Player plays a move by dragging a piece on board. This generates a [PGN notation](https://en.wikipedia.org/wiki/Portable_Game_Notation) of moves.
-2. This notation is sent to api.
-3. API creates its own version of the chess game, and generates a prompt for gemini. You can read about prompt generation below in prompt engineering section
-4. The generated prompt is sent to Gemini which then sends a PGN response back with a new move.
-5. Sometimes Gemini responds with extra characters like * in response. This is cleaned before proceeding to next step.
-5. The response from Gemini can be incorrect, this various checks are done to ensure correct move is played.
-   a. First, the PGN sent from gemini is validated to be correct.
-   b. If the response is incorrect, then system asks gemini for 1 more time to rectify its mistakes. 
-   c. If the new response is valid, then proceeds to next step else app returns a random playable move.
-6. After getting a valid PGN notation from gemini, app checks if the LLM made correct amount of moves (1 more than the total moves after human played)
-7. If number of moves is more than 1 then all other moves are undone and only 1 extra move is added to PGN history.
-8. If number of moves are less than 1, then a random playable move is played and PGN history is returned.
-10. After all these, final check for correct PGN is done. If PGN is valid, it is retuened else a random move is played and returned.
+The human player plays as White, and the AI (Google Gemini) plays as Black. Currently, there is no option for the human player to play as Black. There is no time limit on how long any player can take to make a move.
+
+1. A move is played by the human player by dragging a piece on the board. This generates a PGN notation of the moves which is sent via API to a serverless function.
+2. An internal version of the chess game is created, and a prompt is generated for Gemini. You can read about prompt generation below in the prompt engineering section.
+3. The generated prompt is sent to Gemini, which then sends a PGN response back with a new move.
+- Sometimes, extra characters like `*` are included in Gemini's response. These are cleaned before proceeding to the next step.
+The response from Gemini can be incorrect, so various checks are done to ensure the correct move is played.
+  - First, the PGN sent from Gemini is validated to be correct.
+  - If the response is incorrect, Gemini is asked one more time to rectify its mistakes.
+  - If the new response is valid, it proceeds to the next step; otherwise, a random playable move is returned by the app.
+- After getting a valid PGN notation from Gemini, a check is done by the app to see if the LLM made the correct number of moves (one more than the total moves after the human played).
+- If the number of moves is more than one, all other moves are undone, and only one extra move is added to the PGN history.
+- If the number of moves is less than one, a random playable move is made, and the PGN history is returned.
+- After all these steps, a final check for the correct PGN is done. If the PGN is valid, it is returned; otherwise, a random move is played and returned.
 
 ## Prompt Engineering
 The prompt for the LLM is faily simple. The start of prompt has a context about who the LLM is supposed to be, i.e. A chess grandmaster. It then follows with providing the PGN notation to LLM.  Then, a check is done to  see if any black piece is under attack. In that case, New sentence is added to notify LLM about threats to a piece by various other pieces. The threat is provided for only 1 piece based on order of importance, i.e. **K > Q > R > B > N > P**.
@@ -70,7 +70,7 @@ The prompt for the LLM is faily simple. The start of prompt has a context about 
 > The prompt has a sentence at the end which is always appended to any dynamically generated prompt sentences. This sentence adds a context to only send response in PGN format, not to append or prepend any extra text. LLM might still add new characters sometimes, which will be handled by cleaning functions.
 
 **Here is an example prompt sent:**
-*You are a chess grand master. You will be given a game of history of moves in PGN format. You will play as BLACK. You need to respond your next move in PGN notation. Make sure the move is valid, the PGN notation is valid and you are not making an illegal move. IF THE PGN MOVE HISTORY IS EMPTY, IT MEANS YOU NEED TO START THE GAME WITH A MOVE. Here are the history of moves in the match in PGN notation: '1. e4 c5 2. Bb5 a6 3. Bc4 e6 4. Bxe6'. YOUR PAWN AT SQUARE 'f7' IS UNDER ATTACK FROM FOLLOWING: ' Bishop at square e6,'. MAKE SURE THE PAWN IS PROTECTED BY OTHER PIECE. IF NOT, PROTECT THE PAWN BY ANOTHER PIECE SO THAT THE POINT WILL BE SAME AND YOU WILL NOT BE AT A DISADVANTAGE. WHAT IS YOUR NEXT MOVE? ONLY MAKE ONE MOVE AND REPLY WITH FULL PGN HISTORY UPTO YOUR NEXT MOVE. DONT APPEND OR PREPENT ANY EXTRA TEXT TO PGN STRING"*
+*You are a chess grand master. You will be given a game of history of moves in PGN format. You will play as BLACK. You need to respond your next move in PGN notation. Make sure the move is valid, the PGN notation is valid and you are not making an illegal move. IF THE PGN MOVE HISTORY IS EMPTY, IT MEANS YOU NEED TO START THE GAME WITH A MOVE. Here are the history of moves in the match in PGN notation: '1. e4 c5 2. Bb5 a6 3. Bc4 e6 4. Bxe6'. YOUR PAWN AT SQUARE 'f7' IS UNDER ATTACK FROM FOLLOWING: ' Bishop at square e6,'. MAKE SURE THE PAWN IS PROTECTED BY OTHER PIECE. IF NOT, PROTECT THE PAWN BY ANOTHER PIECE SO THAT THE POINT WILL BE SAME AND YOU WILL NOT BE AT A DISADVANTAGE. WHAT IS YOUR NEXT MOVE? ONLY MAKE ONE MOVE AND REPLY WITH FULL PGN HISTORY UPTO YOUR NEXT MOVE. DONT APPEND OR PREPEND ANY EXTRA TEXT TO PGN STRING"*
 
 ### Possible Improvements
 We can add extra guards to check for various elements like adding the guideline of **Checks, captures, and threats** which basically means: `When you look for your next move, consider checks, captures, and threats`. The first part of this is done as checks is checked when checking for threats for King. The third guideline is also acknowledged by same method. An addition to check for any safe captures can be helpful to guide the model for better move selection.
